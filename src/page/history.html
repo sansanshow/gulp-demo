@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>今日情况</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+		<link rel="stylesheet" href="../style/history.css?@@version" />
+		<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+		<link rel="stylesheet" type="text/css" href="../style/common.css?@@version" />
+		<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+		<script type="text/javascript" src="../js/weui/weui.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script type="text/javascript" src="../js/vue/vue.js"></script>
+		<script src="../js/page/history.js?@@version" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div id="app" class="container">
+			<div class="weui_cells_title"><h3>历史记录</h3></div>
+			
+			<div class="weui_tab">
+				<div class="weui_navbar">
+					<div class="weui_navbar_item">
+						时间排序
+					</div>
+					<div class="weui_navbar_item">
+						时长排序
+					</div>
+				</div>
+				<div class="weui_tab_bd">
+					<div class="weui_tab_bd_item" style="display: none;">
+						<div class="weui_cells">
+							<template v-for="item in list_left">
+								<div class="weui_cell">
+									<div class="weui_cell_hd">
+										<img v-bind:src="item.url" alt="" class="cover">
+									</div>
+									<div class="weui_cell_bd weui_cell_primary">
+										<h3 class="title">{{item.appName}}--{{$index}}</h3>
+										<p class="summary"><label>{{item.start}}~{{item.end}}</label>&nbsp;&nbsp;&nbsp;<label>{{item.time}}</label></p>
+									</div>
+									<div class="weui_cell_ft">
+									</div>
+								</div>
+							</template>
+							<div class="weui_cell">
+								<template v-if="footer_show_l">
+									<div class="weui_cell_bd weui_cell_primary" @click="loadmore(1)">
+										<p align="center">加载更多</p>
+									</div>
+								</template>
+								<template v-else>
+									<div class="weui_cell_bd weui_cell_primary">
+										<p align="center">已全部加载</p>
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
+					<div class="weui_tab_bd_item" style="display: none;">
+						<div class="weui_cells">
+							<template v-for="item in list_right">
+								<div class="weui_cell">
+									<div class="weui_cell_hd">
+										<img v-bind:src="item.url" alt="" class="cover">
+									</div>
+									<div class="weui_cell_bd weui_cell_primary">
+										<h3 class="title">{{item.appName}}--{{$index}}</h3>
+										<p class="summary"><label>{{item.start}}~{{item.end}}</label>&nbsp;&nbsp;&nbsp;<label>{{item.time}}</label></p>
+									</div>
+									<div class="weui_cell_ft">
+									</div>
+								</div>
+							</template>
+							<div class="weui_cell">
+								<template v-if="footer_show_r">
+									<div class="weui_cell_bd weui_cell_primary" @click="loadmore(2)">
+										<p align="center">加载更多</p>
+									</div>
+								</template>
+								<template v-else>
+									<div class="weui_cell_bd weui_cell_primary">
+										<p align="center">已全部加载</p>
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
+				</div>		
+			</div>
+			<!-- 返回 -->	
+			<div class="main">返回</div>	
+		</div>
+		<script>
+			var vm =new Vue({
+				el:"#app",
+				data:{
+					list_left:[],
+					list_right:[],
+					footer_show_l:true,
+					footer_show_r:true
+				},
+				methods:{
+					loadmore:function(type){
+						if(type==1){
+							getList(type, ++page_left,true);
+						}
+						if(type==2){
+							getList(type, ++page_right,true);
+						}
+					}
+				}
+			})
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>今日情况</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+		<link rel="stylesheet" href="../style/history.css?version=1468400537052" />
+		<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+		<link rel="stylesheet" type="text/css" href="../style/common.css?version=1468400537052" />
+		<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+		<script type="text/javascript" src="../js/weui/weui.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script type="text/javascript" src="../js/vue/vue.js"></script>
+		<style type="text/css">
+			.main{
+				position:fixed;
+				bottom:80px;
+				right:5px;
+				border:#CCCCCC 1px solid;
+				background:#EAEAEA;
+				height:50px;
+				width:30px;
+				line-height:25px;
+				color:#666666;
+				font-size:20px;
+			}
+		</style>
+		<script type="text/javascript">
+			var page_left=1;
+			var page_right=1;
+			$(function () {
+				document.body.setAttribute('ontouchstart', '');
+				 // tab
+    			$('.weui_tab').tab();
+    			//sessionStorage.setItem("key", "446698874");
+    			//localStorage.setItem("site", "js8.in");
+    			getList(1,1,false);
+    			getList(2,1,false);
+			});
+			function getList(type,page,foot){
+				if(foot){
+					console.log('加载中----');
+					$.weui.loading('加载中');
+				}
+				var param={userid:localStorage.km_UID,sign:localStorage.km_USIGN,equipid:localStorage.currEquipId};
+				//var param2 = "userid="+localStorage.kmuserid+"&sign=" + localStorage.kmsign+"&openid="+localStorage.openid;
+				var URL=mm_params.history_url.replace("ID",localStorage.currEquipId).replace("PAGE",page).replace("TYPE",type);
+				console.log("-------param-url----");
+				console.log(param);
+				console.log(mm_params.mobile_url + URL);
+				$.ajax({
+					type : 'post',
+					dataType : 'json',
+					url : mm_params.mobile_url + URL,
+					data : param,
+					async : false,
+					success : function(data) {
+						var status = data.status;
+						var historys = data.content;
+						console.log("-------data-----");
+						console.log(data);
+						console.log("-------data---end--");
+						console.log("-------equips---end--");
+						console.log(historys);
+						console.log("-------equips---end--");
+						if (status == 200) {
+							//$.weui.toast('已发送...',1000);
+							console.log("请求成功！！！");
+							if(type==1){
+								if(page==1){
+								console.log("page====1");
+								vm.list_left=[];
+								for ( var int = 0; int < historys.length; int++) {
+									var array_element = historys[int];
+									vm.list_left.push(array_element);
+								}
+								}else{
+									console.log("page   --大于--1--"+page);
+									for ( var int = 0; int < historys.length; int++) {
+										var array_element = historys[int];
+										vm.list_left.push(array_element);
+									}
+								}
+								if(historys.length<10){
+									vm.footer_show_l=false;
+								}
+							}else{
+								if(page==1){
+									console.log("page====1");
+									vm.list_right=[];
+									for ( var int = 0; int < historys.length; int++) {
+										var array_element = historys[int];
+										vm.list_right.push(array_element);
+									}
+								}else{
+									console.log("page   --大于--1--"+page);
+									for ( var int = 0; int < historys.length; int++) {
+										var array_element = historys[int];
+										vm.list_right.push(array_element);
+									}
+								}
+								if(historys.length<10){
+									vm.footer_show_r=false;
+								}
+							}
+							if(foot){
+								console.log('加载完成----');
+								setTimeout($.weui.hideLoading, 50);
+							}
+						} else {
+							$.weui.topTips('请求失败400！');
+							if(foot){
+								setTimeout($.weui.hideLoading, 50);
+							}
+						}
+					},
+					error: function(){
+						//alert("请求失败！！！");
+						if(foot){
+							setTimeout($.weui.hideLoading, 50);
+						}
+						$.weui.topTips('请求失败！');
+						console.log("请求失败！！！");
+					}
+				});
+			}
+		</script>
+	</head>
+
+	<body>
+		<div id="app" class="container">
+			<div class="weui_cells_title"><h3>历史记录</h3></div>
+			
+			<div class="weui_tab">
+				<div class="weui_navbar">
+					<div class="weui_navbar_item">
+						时间排序
+					</div>
+					<div class="weui_navbar_item">
+						时长排序
+					</div>
+				</div>
+				<div class="weui_tab_bd">
+					<div class="weui_tab_bd_item" style="display: none;">
+						<div class="weui_cells">
+							<template v-for="item in list_left">
+								<div class="weui_cell">
+									<div class="weui_cell_hd">
+										<img v-bind:src="item.url" alt="" class="cover">
+									</div>
+									<div class="weui_cell_bd weui_cell_primary">
+										<h3 class="title">{{item.appName}}--{{$index}}</h3>
+										<p class="summary"><label>{{item.start}}~{{item.end}}</label>&nbsp;&nbsp;&nbsp;<label>{{item.time}}</label></p>
+									</div>
+									<div class="weui_cell_ft">
+									</div>
+								</div>
+							</template>
+							<div class="weui_cell">
+								<template v-if="footer_show_l">
+									<div class="weui_cell_bd weui_cell_primary" @click="loadmore(1)">
+										<p align="center">加载更多</p>
+									</div>
+								</template>
+								<template v-else>
+									<div class="weui_cell_bd weui_cell_primary">
+										<p align="center">已全部加载</p>
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
+					<div class="weui_tab_bd_item" style="display: none;">
+						<div class="weui_cells">
+							<template v-for="item in list_right">
+								<div class="weui_cell">
+									<div class="weui_cell_hd">
+										<img v-bind:src="item.url" alt="" class="cover">
+									</div>
+									<div class="weui_cell_bd weui_cell_primary">
+										<h3 class="title">{{item.appName}}--{{$index}}</h3>
+										<p class="summary"><label>{{item.start}}~{{item.end}}</label>&nbsp;&nbsp;&nbsp;<label>{{item.time}}</label></p>
+									</div>
+									<div class="weui_cell_ft">
+									</div>
+								</div>
+							</template>
+							<div class="weui_cell">
+								<template v-if="footer_show_r">
+									<div class="weui_cell_bd weui_cell_primary" @click="loadmore(2)">
+										<p align="center">加载更多</p>
+									</div>
+								</template>
+								<template v-else>
+									<div class="weui_cell_bd weui_cell_primary">
+										<p align="center">已全部加载</p>
+									</div>
+								</template>
+							</div>
+						</div>
+					</div>
+				</div>		
+			</div>
+			<!-- 返回 -->	
+			<div class="main">返回</div>	
+		</div>
+		<script>
+			var vm =new Vue({
+				el:"#app",
+				data:{
+					list_left:[],
+					list_right:[],
+					footer_show_l:true,
+					footer_show_r:true
+				},
+				methods:{
+					loadmore:function(type){
+						if(type==1){
+							getList(type, ++page_left,true);
+						}
+						if(type==2){
+							getList(type, ++page_right,true);
+						}
+					}
+				}
+			})
+		</script>
+	</body>
+
+</html>

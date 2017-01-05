@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>绑定儿童端</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+	<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+	<link rel="stylesheet" type="text/css" href="../style/common.css" />
+	<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+	<script type="text/javascript" src="../js/weui/weui.js"></script>
+	<script type="text/javascript" src="../js/common.js"></script>
+	<script type="text/javascript" src="../js/jquery.qrcode.min.js"></script>
+	<script type="text/javascript">
+		$(function() {
+			updateQrcode();
+			$("#refresh").click(function(){
+				console.log("refresh....");
+				updateQrcode();
+			
+			});
+		});
+		function updateQrcode(){
+			$.weui.loading('加载中');
+			var param={parentId:localStorage.km_UID,childId:localStorage.km_CHILD_ID,sign:localStorage.km_USIGN};
+			console.log(param);
+			$.ajax({
+	            url:mm_params.mobile_url+"/weixin/user/qrcode.wx",
+	            data:param,
+	            type:"POST",
+	            dataType:"json",
+	            jsonp:"callback",
+	            error:function(){setTimeout($.weui.hideLoading, 50);alert("数据加载失败");},
+	            success:function(data){
+	                if(data.status == 200){
+	               		 $("#code").empty();
+		                 $('#code').qrcode({
+							render : "table",
+							width : 200,
+							height : 200,
+							text : data.content
+						});
+	                	setTimeout($.weui.hideLoading, 50);
+	                }else{
+	                	setTimeout($.weui.hideLoading, 50);
+	                	alert("加载失败")
+	                }
+	            }
+	         });
+		}
+		function toUtf8(str) {
+			var out, i, len, c;
+			out = "";
+			len = str.length;
+			for (i = 0; i < len; i++) {
+				c = str.charCodeAt(i);
+				if ((c >= 0x0001) && (c <= 0x007F)) {
+					out += str.charAt(i);
+				} else if (c > 0x07FF) {
+					out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
+					out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
+					out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+				} else {
+					out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
+					out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
+				}
+			}
+			return out;
+		}
+	</script>
+</head>
+
+<body>
+	<div class="weui_cells_title">扫描下方二维码进行绑定</div>
+	<div class="weui_cells">
+
+		<div class="weui_cell">
+			<div class="weui_cell_bd weui_cell_primary" align="center">
+				<label class="weui_cells_title">使用苗苗儿童端扫描二维码</label>
+			</div>
+		</div>
+		<div class="weui_cell">
+			<div class="weui_cell_bd weui_cell_primary" align="center" id="code">
+
+			</div>
+		</div>
+	</div>
+	<div class="weui_btn_area">
+			<a class="weui_btn weui_btn_plain_primary" id="refresh"
+				href="javascript:void(0);">刷新二维码</a>
+	</div>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+body {
+	background-color: #efeff4;
+}
+.weui_grid_2 {
+  position: relative;
+  float: left;
+  padding: 20px 10px;
+  width: 50%;
+  box-sizing: border-box;
+}

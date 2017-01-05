@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<!-- meta使用viewport以确保页面可自由缩放 -->
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+		<title>孩子资料填写</title>
+		<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+		<link rel="stylesheet" type="text/css" href="../style/common.css?version=1468400537052" />
+		<link rel="stylesheet" type="text/css" href="../style/amazeui/css/amazeui.min.css"/>
+		<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+		<script type="text/javascript" src="../js/weui/weui.js"></script>
+		<script src="../style/amazeui/js/amazeui.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript" src="../js/common.js?version=1468400537052"></script>
+		<script>
+			var method = getUrlParam("method");
+			$(function() {
+				$('#save').on('click',function(e) {
+					var pairs = $('form').serialize().split(/&/gi);
+					var data = {};
+					pairs.forEach(function(pair) {
+						pair = pair.split('=');
+						data[pair[0]] = decodeURIComponent(pair[1] || '');
+					});
+					if (!data.name || data.name.replace(/^ +| +$/g , '')=='') {
+						$.weui.topTips('姓名不能为空');
+						return false;
+					}
+					console.log("-gender--"+data.gender);
+					if (!data.birth ||  data.birth.replace(/^ +| +$/g , '')=='') {
+						$.weui.topTips('选择生日');
+						return false;
+					}
+					var gender=data.gender;
+					var  ddate = new Date(data.birth.trim()).getTime();
+					console.log("-method--"+method);
+					//localStorage.km_UID,childId:localStorage.km_CHILD_ID,sign:localStorage.km_USIGN
+					var params = {userid:localStorage.km_UID,sign:localStorage.km_USIGN,gender:gender,name:data.name,birth:ddate};
+					if(method=='update'){
+						var child_id = getUrlParam("c_id");
+						console.log("---method--update-");
+						var params = {userid:localStorage.km_UID,sign:localStorage.km_USIGN,id:child_id,gender:0,name:data.name,birth:ddate};
+					}
+		            $.ajax({
+		                url:mm_params.page_url+"/weixin/child/"+method+"/child.wx",
+		                data:params,
+		                type:"POST",
+		                dataType:"json",
+		                //jsonp: 'jsoncallback', //默认callback 
+		                error:function(){
+			                setTimeout($.weui.hideLoading, 0);
+							alert("数据加载失败");
+		                },
+		                success:function(data){
+		                	console.log("success");
+		                    if(data.status == 200){
+		                		console.log("success--200");
+		                		if(method=='update'){
+		                			$.weui.toast('修改成功',2000);
+		                		}else{
+		                			$.weui.toast('保存成功');
+		                			console.log(data.content);
+									console.log(data.content.id);
+		                			localStorage.setItem("km_CHILD", data.content);
+									localStorage.setItem("km_CHILD_ID", data.content.id);
+									window.location.href = mm_params.mobile_url+"/page/qrcode.html";
+		                		}
+		                		console.log(data);
+		                    }else{
+		                		console.log("success-not-200");
+		                    	window.close();
+		                    	alert('操作失败');
+		                    }
+		                }
+		            });
+				})
+			})
+			function  jsoncallback(){
+				console.log( "jsonp: 'jsoncallback', //默认callback ");
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="container22">
+			<div class="weui_cells_title">
+				孩子资料填写
+			</div>
+			<form>
+				<div class="weui_cells weui_cells_form">
+					<div class="weui_cell">
+						<div class="weui_cell_hd">
+							<label class="weui_label">姓名</label>
+						</div>
+						<div class="weui_cell_bd weui_cell_primary">
+							<input name="name" class="weui_input" type="text" placeholder="孩子姓名" />
+						</div>
+					</div>
+					<div class="weui_cell weui_cell_select">
+						<div class="weui_cell_hd">
+							<div class="weui_label" style="padding-left: 15px;">性别</div>
+						</div>
+						<div class="weui_cell_bd weui_cell_primary">
+							<select name="gender"class="weui_select">
+								<option value="1" selected="selected">男</option>
+								<option value="0">女</option>
+							</select>
+						</div>
+					</div>
+					<div class="weui_cell">
+						<div class="weui_cell_hd">
+							<label class="weui_label">生日</label>
+						</div>
+						<div class="weui_cell_bd" data-am-datepicker="{format: 'dd-mm-yyyy'}">
+  							<input type="text" name="birth" class="weui_input" placeholder="生日选择" data-am-datepicker readonly required />
+						</div>
+					</div>
+				</div>
+			</form>
+			<div class="weui_btn_area">
+				<a class="weui_btn weui_btn_plain_primary" id="save" href="javascript:void(0);">保存</a>
+			</div>
+		</div>
+	</body>

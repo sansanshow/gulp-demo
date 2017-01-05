@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<base href="<%=basePath%>">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="keywords" content="苗苗,苗苗家长端,苗苗儿童端">
+<meta http-equiv="description" content="苗苗登录">
+<title>登录</title>
+
+<meta charset="utf-8" />
+<!-- meta使用viewport以确保页面可自由缩放 -->
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+<link rel="stylesheet" type="text/css" href="../style/common.css?@@version" />
+<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+<script type="text/javascript" src="../js/weui/weui.js"></script>
+<script type="text/javascript" src="../js/common.js?@@version"></script>
+<script type="text/javascript" src="../js/page/login.js?@@version"></script> 
+
+</head>
+<body>
+	<form>
+		<div class="weui_cells_title">
+			<h3>绑定手机号</h3>
+		</div>
+		<div class="weui_cells weui_cells_form">
+			<div class="weui_cell">
+				<div class="weui_cell_bd weui_cell_primary">
+					<input id="mobile" name="mobile" class="weui_input" type="tel" value="18235445764"
+						placeholder="请输入手机号">
+				</div>
+			</div>
+			<div class="weui_cell">
+				<div class="weui_cell_bd weui_cell_primary">
+					<input name="verifycode" id="code" class="weui_input" type="tel"  value="449358"
+						placeholder="请输入验证码">
+				</div>
+				<div class="weui_cell_ft weui_cell_primary">
+					<a href="javascript:void(0);" id="sendvcode"
+						class="weui_btn weui_btn_mini weui_btn_primary">发送验证码</a>
+				</div>
+				<input name="function" id="function" type="hidden" value="bind"/>
+			</div>
+		</div>
+		<p class="weui_cells_tips">提示:绑定手机号才能使用</p>
+		<div class="weui_btn_area">
+			<a href="javascript:;" class="weui_btn weui_btn_primary" id="btn_login">登录</button>
+		</div>
+
+	</form>
+</body>
+</html>

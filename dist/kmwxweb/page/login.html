@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<base href="<%=basePath%>">
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="cache-control" content="no-cache">
+<meta http-equiv="expires" content="0">
+<meta http-equiv="keywords" content="苗苗,苗苗家长端,苗苗儿童端">
+<meta http-equiv="description" content="苗苗登录">
+<title>登录</title>
+
+<meta charset="utf-8" />
+<!-- meta使用viewport以确保页面可自由缩放 -->
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+
+<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+<link rel="stylesheet" type="text/css" href="../style/common.css" />
+<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+<script type="text/javascript" src="../js/weui/weui.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<!-- <script type="text/javascript" src="../js/page/login.js"></script> -->
+<script>
+	var openid;
+	$(function() {
+		$('#btn_login').on('click',function(e) {
+			//alert("sss");
+			var pairs = $('form').serialize().split(/&/gi);
+			var data = {};
+			pairs.forEach(function(pair) {
+				pair = pair.split('=');
+				data[pair[0]] = decodeURIComponent(pair[1] || '');
+			});
+			if (!data.mobile || !/^1\d{10}$/.test(data.mobile)) {
+				$.weui.topTips('请输入正确手机号');
+				return false;
+			}
+			if (!data.verifycode || !/\d{6}$/.test(data.verifycode)) {
+				$.weui.topTips('请输入验证码');
+				return false;
+			}
+			var param = "mobile=" + data.mobile
+					+ "&verifycode=" + data.verifycode
+					+ "&openid=" + localStorage.WeiXin_UID
+					+ "&function=bind";
+			console.log(param);
+			$.weui.loading('正在登录...');
+			$.ajax({
+				type : "post",
+				dataType:"json",
+                jsonp:"callback",
+				url : mm_params.mobile_url+"/weixin/user/bind.wx",
+				data : param,
+				async : false,
+				error:function(){setTimeout($.weui.hideLoading, 0);$.weui.toast('数据请求异常');},
+				success : function(data) {
+					if(data.status == 200){
+						setTimeout($.weui.hideLoading, 0);
+						$.weui.toast('登录成功');
+						//localStorage.setItem("WeiXin_UID", data.openid);
+						//alert("user:"+data.user+",uid:"+data.user.userid+",sign:"+data.user.sign);
+						console.log("user:"+data.user);
+						console.log("uid:"+data.user.userid);
+						console.log("sign:"+data.user.sign);
+						localStorage.setItem("km_UINFO", data.user);
+						localStorage.setItem("km_UID", data.user.userid);
+						localStorage.setItem("km_USIGN", data.user.sign);
+						switch(data.type)//100:index 101:扫码绑定 102:添加孩子 103:login
+						{
+						case 100:
+							window.location.href=mm_params.page_url+"/page/index.html"
+							//localStorage.setItem("km_UINFO", data.user);
+							//localStorage.setItem("km_UID", data.user.userid);
+						  	break;
+						case 101:
+							window.location.href=mm_params.page_url+"/page/qrcode.html"
+						  	break;
+						case 102:
+							window.location.href=mm_params.page_url+"/page/add_child.html"
+						  	break;
+						case 103:
+							window.location.href=mm_params.page_url+"/page/login.html"
+						  	break;
+						default:
+						 	 break;
+						}
+					}else{
+						$.weui.toast('登录失败');
+					}
+				}
+			});
+		})
+		$('#sendvcode').on('click',function(e) {
+			openid = localStorage.WeiXin_UID;
+			if (!$("#mobile").val() || !/^1\d{10}$/.test($("#mobile").val())) {
+				$.weui.topTips('请输入正确手机号');
+				return;
+			}
+			var param2 = "mobile=" + $("#mobile").val() + "&openid="+openid + "&function=bind";
+			//alert(param2);
+			console.log(param2);
+			$.ajax({
+				type : "post",
+				dataType : "json",
+				url : "http://t.kidmate.cn/kidmatemobile/weixin/user/sendsms.wx",
+				data : param2,
+				async : false,
+				success : function(ret_data) {
+					var status = ret_data.status;
+					console.log(status);
+					var vcode = ret_data.content;
+					if (status == "success") {
+						$.weui.toast('已发送...',1000);
+					} else {
+						$.weui.topTips('验证码发送失败！');
+					}
+				}
+			});
+		})
+		
+	})
+</script>
+</head>
+<body>
+	<form>
+		<div class="weui_cells_title">
+			<h3>绑定手机号</h3>
+		</div>
+		<div class="weui_cells weui_cells_form">
+			<div class="weui_cell">
+				<div class="weui_cell_bd weui_cell_primary">
+					<input id="mobile" name="mobile" class="weui_input" type="tel" value="18235445764"
+						placeholder="请输入手机号">
+				</div>
+			</div>
+			<div class="weui_cell">
+				<div class="weui_cell_bd weui_cell_primary">
+					<input name="verifycode" id="code" class="weui_input" type="tel"  value="449358"
+						placeholder="请输入验证码">
+				</div>
+				<div class="weui_cell_ft weui_cell_primary">
+					<a href="javascript:void(0);" id="sendvcode"
+						class="weui_btn weui_btn_mini weui_btn_primary">发送验证码</a>
+				</div>
+				<input name="function" id="function" type="hidden" value="bind"/>
+			</div>
+		</div>
+		<p class="weui_cells_tips">提示:绑定手机号才能使用</p>
+		<div class="weui_btn_area">
+			<a href="javascript:;" class="weui_btn weui_btn_primary" id="btn_login">登录</button>
+		</div>
+
+	</form>
+</body>
+</html>

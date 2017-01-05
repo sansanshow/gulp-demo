@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>jssdk测试</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+		<link rel="stylesheet" type="text/css" href="../style/weui/weui.css" />
+		<link rel="stylesheet" type="text/css" href="../style/common.css" />
+		<script type="text/javascript" src="../js/weui/jquery-3.0.0.min.js"></script>
+		<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+		<script type="text/javascript" src="../js/weui/weui.js"></script>
+		<script type="text/javascript" src="../js/common.js"></script>
+		<script>
+			$(function(){
+				var param={url:'http://t.kidmate.cn/kidmatemobile/page/jssdk.html'};
+				$.ajax({
+					type : 'post',
+					dataType : 'json',
+					url : mm_params.mobile_url+'/weixin/core/wxconfig.wx',
+					data : param,
+					async : false,
+					success : function(data) {
+						var status = data;
+						console.log("-------data-----");
+						console.log(data);
+						var timestamp = data.timestamp;
+						var nonceStr = data.nonceStr;
+						var signature = data.signature;
+						console.log("-------data---end--");
+						wxyz(timestamp,nonceStr,signature);
+					},
+					error: function(){
+						//alert("请求失败！！！");
+						console.log("请求失败！！！");
+					}
+				});
+			})
+			function wxyz(timestamp,nonceStr,signature){
+				wx.config({
+				    debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+				    appId: 'wx365c10c5232278d3', // 必填，公众号的唯一标识
+				    timestamp: timestamp, // 必填，生成签名的时间戳
+				    nonceStr: nonceStr, // 必填，生成签名的随机串
+				    signature: signature,// 必填，签名，见附录1
+				    jsApiList: [
+						'checkJsApi',
+						'onMenuShareTimeline',
+						'onMenuShareAppMessage',
+						'onMenuShareQQ'
+				    ] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+				});
+			}
+		</script>
+	</head>
+	<body>
+	</body>
+</html>
